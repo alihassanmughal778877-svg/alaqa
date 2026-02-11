@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Button from './Button';
+import Link from 'next/link';
 
 const expertiseItems = [
   {
@@ -215,7 +216,7 @@ export default function Expertise() {
                 </div>
 
                 <div className="transform transition-all duration-300 hover:scale-105">
-                  <Button variant="outline">More details</Button>
+                  <Link href={"/blockchain"} variant="outline">More details</Link>
                 </div>
               </div>
             </div>
