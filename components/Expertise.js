@@ -216,7 +216,7 @@ export default function Expertise() {
                 </div>
 
                 <div className="transform transition-all duration-300 hover:scale-105">
-                  <Link href={"/blockchain"} variant="outline">More details</Link>
+                  <Link href={"/blockchain"}>  <Button variant="outline">More details</Button></Link> 
                 </div>
               </div>
             </div>
