@@ -1,11 +1,13 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import Button from "./Button";
 
 export default function Hero() {
   const videoRef = useRef(null);
   const mobileVideoRef = useRef(null);
+  const sectionRef = useRef(null);
+  const [isInView, setIsInView] = useState(true);
 
   useEffect(() => {
     const unmuteVideos = () => {
@@ -30,8 +32,57 @@ export default function Hero() {
     };
   }, []);
 
+  // Play/Pause video based on scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      if (sectionRef.current) {
+        const rect = sectionRef.current.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        
+        // Check if section is in viewport (with some threshold)
+        const isVisible = rect.top < windowHeight && rect.bottom > 0;
+        
+        setIsInView(isVisible);
+      }
+    };
+
+    // Initial check
+    handleScroll();
+
+    // Add scroll listener
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  // Control video playback based on visibility
+  useEffect(() => {
+    const playVideo = async (videoElement) => {
+      if (!videoElement) return;
+      
+      try {
+        if (isInView) {
+          await videoElement.play();
+        } else {
+          videoElement.pause();
+        }
+      } catch (error) {
+        // Auto-play was prevented or video paused
+        console.log("Video playback error:", error);
+      }
+    };
+
+    playVideo(videoRef.current);
+    playVideo(mobileVideoRef.current);
+  }, [isInView]);
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-600 via-black to-gray-800 overflow-hidden">
+    <section 
+      ref={sectionRef}
+      className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-600 via-black to-gray-800 overflow-hidden"
+    >
       {/* Background Video */}
       <div className="absolute inset-0 w-full h-full">
         <video
@@ -63,7 +114,7 @@ export default function Hero() {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-20 text-center">
         <h1
-          className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
+          className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight animate-fadeIn"
           style={{
             textShadow: "2px 2px 8px rgba(0,0,0,0.7)",
           }}
@@ -72,11 +123,11 @@ export default function Hero() {
           <br />
           <span style={{ color: "#6B1C95" }}>SMART WEB SOLUTIONS</span>
         </h1>
-        <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+        <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto animate-fadeInUp">
           We deliver end-to-end web design, development & marketing services
           with 200% approach.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fadeInUp">
           <Button variant="primary" className="text-lg !px-4 py-2">
             Get Started
           </Button>
@@ -85,28 +136,6 @@ export default function Hero() {
           </Button>
         </div>
       </div>
-
-      {/* Award Banner */}
-      {/* <div
-        className="absolute bottom-0 left-0 right-0 py-3"
-        style={{ backgroundColor: "#6B1C95" }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center space-x-2 text-white text-sm md:text-base">
-            <svg
-              className="w-5 h-5 md:w-6 md:h-6"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-            <span className="font-semibold">
-              From our Blog: Explore the latest updates, insights, and success
-              stories from our team...
-            </span>
-          </div>
-        </div>
-      </div> */}
     </section>
   );
 }
